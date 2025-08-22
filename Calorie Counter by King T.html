@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Calorie Counter by King T.</title>
+<!-- Century Gothic Font Import -->
+<style>
+@font-face {
+    font-family: 'Century Gothic';
+    src: local('Century Gothic'), local('CenturyGothic'),
+         url('https://fonts.cdnfonts.com/s/29116/CenturyGothic.woff') format('woff');
+}
+@font-face {
+    font-family: 'Century Gothic Bold';
+    src: local('Century Gothic Bold'), local('CenturyGothic-Bold'),
+         url('https://fonts.cdnfonts.com/s/29116/CenturyGothic-Bold.woff') format('woff');
+    font-weight: bold;
+}
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        margin: 10px;
+    }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    .food-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .food-item div {
+        align-self: flex-end;
+    }
+    .stats {
+        grid-template-columns: repeat(auto-fit,minmax(120px,1fr));
+    }
+}
+:root {
+    --primary-red: #ce372f; /* Pantone 180C */
+    --primary-black: #000000;
+    --input-bg: #282828;
+    --text-light: #FFFFFF;
+}
+* { box-sizing: border-box; }
+body {
+    font-family: 'Century Gothic', Arial, sans-serif;
+    background-color: var(--primary-black);
+    color: var(--text-light);
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    background-color: var(--primary-black);
+    padding: 25px;
+    border-radius: 12px;
+}
+.header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+h1.title {
+    text-align: center;
+    font-size: 2rem;
+    font-family: 'Century Gothic Bold', Arial, sans-serif;
+    color: var(--primary-red);
+    margin-top: 10px;
+    letter-spacing: 1px;
+}
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+input, select {
+    width: 100%;
+    padding: 12px;
+    background: var(--input-bg);
+    color: var(--text-light);
+    border: 1px solid #333;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Century Gothic', Arial, sans-serif;
+}
+input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+input:focus, select:focus {
+    border-color: var(--primary-red);
+    outline: none;
+    background: #303030;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-red);
+    color: #fff;
+    font-weight: bold;
+    font-family: 'Century Gothic Bold', Arial, sans-serif;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+button:hover { opacity: 0.9; }
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(170px,1fr));
+    gap: 10px;
+    background: var(--input-bg);
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+}
+
+.stats span {
+    display: block;
+    font-size: 1.3rem;
+    font-family: 'Century Gothic Bold';
+}
+
+.progress {
+    background: #282828;
+    height: 20px;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar {
+    background: var(--primary-red);
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+.meal {
+    border: 1px solid var(--primary-red);
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.meal-header {
+    background: var(--primary-red);
+    color: #fff;
+    padding: 12px;
+    font-weight: bold;
+    font-family: 'Century Gothic Bold';
+    text-align: center;
+}
+
+.meal-content {
+    padding: 10px;
+    background: var(--input-bg);
+}
+
+.food-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--primary-black);
+    border-radius: 6px;
+    margin: 4px 0;
+}
+.food-item span {
+    white-space: nowrap;
+    flex-grow: 1;
+}
+.delete-btn {
+    background: var(--primary-red);
+    border: none;
+    color: white;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    padding: 0;
+}
+#status-message {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+}
+.change-profile-btn {
+    background: var(--primary-red);
+    margin-top: 15px;
+}
+.footer-note {
+    text-align: right;
+    font-family: 'Century Gothic', Arial, sans-serif;
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-top: 20px;
+}
+.footer-note a {
+    color: var(--primary-red);
+    font-weight: bold;
+    text-decoration: none;
+}
+.footer-note a:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1 class="title">Calorie Counter by King T.</h1>
+    </div>
+    <!-- PROFILE -->
+    <div id="profile-section">
+        <h2>Your Profile</h2>
+        <div class="grid">
+            <div><label>Height (cm)</label><input type="number" id="height" placeholder="e.g. 170"></div>
+            <div><label>Weight (kg)</label><input type="number" id="weight" placeholder="e.g. 65"></div>
+            <div><label>Age</label><input type="number" id="age" placeholder="e.g. 30"></div>
+            <div><label>Gender</label>
+                <select id="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                </select>
+            </div>
+            <div><label>Activity Level</label>
+                <select id="activity">
+                    <option value="1.2">Sedentary</option>
+                    <option value="1.375">Light Exercise</option>
+                    <option value="1.55">Moderate Exercise</option>
+                    <option value="1.725">Heavy Exercise</option>
+                    <option value="1.9">Extra Heavy</option>
+                </select>
+            </div>
+            <div><label>Daily Goal Calories</label><input type="number" id="manual-goal" placeholder="e.g. 2000"></div>
+            <div><label>Goal Period</label>
+                <select id="goal-period">
+                    <option value="daily">Daily</option>
+                    <option value="weekly" selected>Weekly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="setGoal()">Set Goal</button>
+    </div>
+    <!-- STATS -->
+    <h2 id="stats-title">Total Stats</h2>
+    <div class="stats">
+        <div>Goal Calories<span id="target">0</span></div>
+        <div>Maintenance Calories<span id="maintenance">0</span></div>
+        <div>Consumed Calories<span id="consumed">0</span></div>
+        <div>Burned Calories (Steps)<span id="burned">0</span></div>
+    </div>
+  <div class="progress">
+    <div class="progress-bar" id="progress-bar"></div>
+    <div class="progress-text" id="progress-text">0%</div>
+</div>
+
+    <!-- DAILY FOOD LOG -->
+    <div class="meal">
+        <div class="meal-header">Daily Food Log</div>
+        <div class="meal-content grid" style="grid-template-columns: 2fr 1fr 1fr auto;">
+            <input type="text" placeholder="Food Item / Day" id="food-day">
+            <input type="number" placeholder="Calories" id="food-cal">
+            <input type="number" placeholder="Portions" id="food-portion" value="1">
+            <button onclick="addFood()">Add Food</button>
+        </div>
+        <div id="food-list" style="padding: 10px;"></div>
+        <div style="text-align:right; padding: 8px; font-weight:bold;">
+            Total Food Calories: <span id="food-total">0</span>
+        </div>
+    </div>
+
+    <!-- DAILY STEP LOG -->
+    <div class="meal">
+        <div class="meal-header">Daily Step Log</div>
+        <div class="meal-content grid" style="grid-template-columns: 2fr 1fr auto;">
+            <input type="text" placeholder="Day" id="step-day">
+            <input type="number" placeholder="Steps" id="step-count">
+            <button onclick="addSteps()">Add Steps</button>
+        </div>
+        <div style="padding: 8px; font-size: 0.9rem;" id="steps-info">Calories burned per step: 0.04</div>
+        <div id="step-list" style="padding: 10px;"></div>
+        <div style="text-align:right; padding: 8px; font-weight:bold;">
+            Total Steps: <span id="step-total">0</span> | 
+            Calories Burned: <span id="step-calories">0</span>
+        </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="meal">
+        <div class="meal-header">Summary</div>
+        <div class="meal-content">
+            <div style="text-align:center; padding: 10px; font-weight:bold; font-size: 1.1rem;">
+                <div>Net Calories: <span id="net-calories">0</span></div>
+                <div style="margin-top: 10px;">
+                    <span id="diff-text"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p id="status-message"></p>
+    
+    <div style="text-align:center;">
+    <button class="change-profile-btn" onclick="changeProfile()">Change Profile</button>
+    <button class="change-profile-btn" onclick="clearAllData()" style="background: #666; margin-left: 10px;">Clear All Data</button>
+</div>
+    
+    <!-- FOOTER NOTE -->
+<div class="footer-note">
+    please contact <a href="mailto:king.tangcuangco@mrl.com.au?subject=Calorie%20Counter%20Feedback&body=Hello%20King,%0D%0A%0D%0AHere%E2%80%99s%20my%20feedback%20on%20the%20Calorie%20Counter:" target="_blank">
+        King Tangcuangco – Graduate Mechatronics Engineer
+    </a> for any queries or recommendation<br>
+    <span style="font-size: 0.75rem; color: #666; font-style: italic;">
+        Built with ✨ vibe coding
+    </span>
+</div>
+
+<script>
+let foodList = [];
+let stepList = [];
+let targetCalories = 0;
+let maintenanceCalories = 0;
+let goalPeriod = "weekly";
+let profileVisible = true;
+let editingFoodIndex = -1;
+let editingStepIndex = -1;
+
+function saveData(){
+    localStorage.setItem("calorieProfile", JSON.stringify({
+        height: document.getElementById("height").value,
+        weight: document.getElementById("weight").value,
+        age: document.getElementById("age").value,
+        gender: document.getElementById("gender").value,
+        activity: document.getElementById("activity").value,
+        target: targetCalories,
+        maintenance: maintenanceCalories,
+        goalPeriod
+    }));
+    localStorage.setItem("calorieFoodList", JSON.stringify(foodList));
+    localStorage.setItem("calorieStepList", JSON.stringify(stepList));
+}
+
+function loadData(){
+    const savedProfile = JSON.parse(localStorage.getItem("calorieProfile") || "{}");
+    const savedFoodList = JSON.parse(localStorage.getItem("calorieFoodList") || "[]");
+    const savedStepList = JSON.parse(localStorage.getItem("calorieStepList") || "[]");
+    
+    if(savedProfile.target){
+        document.getElementById("height").value = savedProfile.height || "";
+        document.getElementById("weight").value = savedProfile.weight || "";
+        document.getElementById("age").value = savedProfile.age || "";
+        document.getElementById("gender").value = savedProfile.gender || "male";
+        document.getElementById("activity").value = savedProfile.activity || "1.2";
+        document.getElementById("manual-goal").value = Math.round((savedProfile.goalPeriod==="weekly") ? savedProfile.target/7 :
+                                                                 (savedProfile.goalPeriod==="monthly") ? savedProfile.target/30 : savedProfile.target);
+        goalPeriod = savedProfile.goalPeriod;
+        document.getElementById("goal-period").value = goalPeriod;
+        targetCalories = savedProfile.target;
+        maintenanceCalories = savedProfile.maintenance || 0;
+        document.getElementById("target").textContent = targetCalories;
+        document.getElementById("maintenance").textContent = maintenanceCalories;
+        document.getElementById("profile-section").style.display = "none";
+        profileVisible = false;
+    }
+    
+    foodList = savedFoodList || [];
+    stepList = savedStepList || [];
+    
+    if(foodList.length > 0) renderFoodList();
+    if(stepList.length > 0) renderStepList();
+    updateStats();
+}
+
+function setGoal(){
+    const h = +document.getElementById("height").value;
+    const w = +document.getElementById("weight").value;
+    const a = +document.getElementById("age").value;
+    const g = document.getElementById("gender").value;
+    const act = +document.getElementById("activity").value;
+    goalPeriod = document.getElementById("goal-period").value;
+    const manualGoal = +document.getElementById("manual-goal").value;
+    
+    if(!h || !w || !a){ alert("Please fill in your height, weight, and age."); return; }
+    if(!manualGoal){ alert("Please enter your daily goal calories."); return; }
+    
+    let bmr = g==="male"
+        ? 88.362 + (13.397*w) + (4.799*h) - (5.677*a)
+        : 447.593 + (9.247*w) + (3.098*h) - (4.330*a);
+    let dailyMaintenance = Math.round(bmr * act);
+    
+    if (goalPeriod === "weekly") {
+        maintenanceCalories = dailyMaintenance * 7;
+        targetCalories = manualGoal * 7;
+    } else if (goalPeriod === "monthly") {
+        maintenanceCalories = dailyMaintenance * 30;
+        targetCalories = manualGoal * 30;
+    } else {
+        maintenanceCalories = dailyMaintenance;
+        targetCalories = manualGoal;
+    }
+    
+    document.getElementById("target").textContent = targetCalories;
+    document.getElementById("maintenance").textContent = maintenanceCalories;
+    saveData();
+    updateStats();
+    document.getElementById("profile-section").style.display = "none";
+    profileVisible = false;
+}
+
+function changeProfile(){
+    document.getElementById("profile-section").style.display = "block";
+    profileVisible = true;
+    document.getElementById("profile-section").scrollIntoView({ behavior: "smooth" });
+}
+
+function clearAllData(){
+    if(confirm("Are you sure you want to clear all data? This cannot be undone.")){
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+function addFood(){
+    const day = document.getElementById("food-day").value;
+    const cal = +document.getElementById("food-cal").value;
+    const portion = +document.getElementById("food-portion").value;
+    
+    if(!day || !cal){ alert("Enter food item/day and calories"); return; }
+    
+    if(editingFoodIndex >= 0){
+        foodList[editingFoodIndex] = { day, totalCal: cal * portion };
+        cancelFoodEdit();
+    } else {
+        foodList.push({ day, totalCal: cal * portion });
+    }
+    
+    document.getElementById("food-day").value = '';
+    document.getElementById("food-cal").value = '';
+    document.getElementById("food-portion").value = 1;
+    renderFoodList();
+    saveData();
+}
+
+function addSteps(){
+    const day = document.getElementById("step-day").value;
+    const steps = +document.getElementById("step-count").value;
+    
+    if(!day || !steps){ alert("Enter day and steps"); return; }
+    
+    if(editingStepIndex >= 0){
+        stepList[editingStepIndex] = { day, steps, calories: Math.round(steps * 0.04) };
+        cancelStepEdit();
+    } else {
+        stepList.push({ day, steps, calories: Math.round(steps * 0.04) });
+    }
+    
+    document.getElementById("step-day").value = '';
+    document.getElementById("step-count").value = '';
+    renderStepList();
+    saveData();
+}
+
+function editFood(index){
+    const item = foodList[index];
+    document.getElementById("food-day").value = item.day;
+    document.getElementById("food-cal").value = item.totalCal;
+    document.getElementById("food-portion").value = 1;
+    editingFoodIndex = index;
+    renderFoodList();
+    document.getElementById("food-day").scrollIntoView({ behavior: "smooth" });
+    document.getElementById("food-day").focus();
+}
+
+function editStep(index){
+    const item = stepList[index];
+    document.getElementById("step-day").value = item.day;
+    document.getElementById("step-count").value = item.steps;
+    editingStepIndex = index;
+    renderStepList();
+    document.getElementById("step-day").scrollIntoView({ behavior: "smooth" });
+    document.getElementById("step-day").focus();
+}
+
+function cancelFoodEdit(){
+    editingFoodIndex = -1;
+    document.getElementById("food-day").value = '';
+    document.getElementById("food-cal").value = '';
+    document.getElementById("food-portion").value = 1;
+    renderFoodList();
+}
+
+function cancelStepEdit(){
+    editingStepIndex = -1;
+    document.getElementById("step-day").value = '';
+    document.getElementById("step-count").value = '';
+    renderStepList();
+}
+
+function updateFoodButton(){
+    const foodButtons = document.querySelectorAll('button');
+    for(let button of foodButtons){
+        if(button.textContent === 'Add Food' || button.textContent === 'Update Food'){
+            button.textContent = editingFoodIndex >= 0 ? 'Update Food' : 'Add Food';
+            break;
+        }
+    }
+}
+
+function updateStepButton(){
+    const stepButtons = document.querySelectorAll('button');
+    for(let button of stepButtons){
+        if(button.textContent === 'Add Steps' || button.textContent === 'Update Steps'){
+            button.textContent = editingStepIndex >= 0 ? 'Update Steps' : 'Add Steps';
+            break;
+        }
+    }
+}
+
+function renderFoodList(){
+    const list = document.getElementById("food-list");
+    list.innerHTML = '';
+    foodList.forEach((item, index) => {
+        const isEditing = editingFoodIndex === index;
+        list.innerHTML += `
+            <div class="food-item" style="${isEditing ? 'background: #444; border: 2px solid var(--primary-red);' : ''}">
+                <span>${item.day} - ${item.totalCal} cal ${isEditing ? '(Editing)' : ''}</span>
+                <div style="display: flex; gap: 5px;">
+                    ${isEditing ?
+                        `<button class="delete-btn" onclick="cancelFoodEdit()" style="width: auto; padding: 0 8px; background: #666;">Cancel</button>` :
+                        `<button class="delete-btn" onclick="editFood(${index})" style="width: auto; padding: 0 8px; background: #4CAF50;">Edit</button>
+                         <button class="delete-btn" onclick="removeFood(${index})">×</button>`
+                    }
+                </div>
+            </div>
+        `;
+    });
+    const totalFood = foodList.reduce((sum, item) => sum + item.totalCal, 0);
+    document.getElementById("food-total").textContent = totalFood;
+    updateFoodButton();
+    updateStats();
+}
+
+function renderStepList(){
+    const list = document.getElementById("step-list");
+    list.innerHTML = '';
+    stepList.forEach((item, index) => {
+        const isEditing = editingStepIndex === index;
+        list.innerHTML += `
+            <div class="food-item" style="${isEditing ? 'background: #444; border: 2px solid var(--primary-red);' : ''}">
+                <span>${item.day} - ${item.steps} steps (${item.calories} cal burned) ${isEditing ? '(Editing)' : ''}</span>
+                <div style="display: flex; gap: 5px;">
+                    ${isEditing ?
+                        `<button class="delete-btn" onclick="cancelStepEdit()" style="width: auto; padding: 0 8px; background: #666;">Cancel</button>` :
+                        `<button class="delete-btn" onclick="editStep(${index})" style="width: auto; padding: 0 8px; background: #4CAF50;">Edit</button>
+                         <button class="delete-btn" onclick="removeStep(${index})">×</button>`
+                    }
+                </div>
+            </div>
+        `;
+    });
+    
+    const totalSteps = stepList.reduce((sum, item) => sum + item.steps, 0);
+    const totalCaloriesBurned = stepList.reduce((sum, item) => sum + item.calories, 0);
+    
+    document.getElementById("step-total").textContent = totalSteps;
+    document.getElementById("step-calories").textContent = totalCaloriesBurned;
+    updateStepButton();
+    updateStats();
+}
+
+function removeFood(index){
+    foodList.splice(index, 1);
+    renderFoodList();
+    saveData();
+}
+
+function removeStep(index){
+    stepList.splice(index, 1);
+    renderStepList();
+    saveData();
+}
+
+function updateStats(){
+    const totalConsumed = foodList.reduce((sum, item) => sum + item.totalCal, 0);
+    const totalBurned = stepList.reduce((sum, item) => sum + item.calories, 0);
+    const netCalories = totalConsumed - totalBurned;
+    
+    document.getElementById("consumed").textContent = totalConsumed;
+    document.getElementById("burned").textContent = totalBurned;
+    document.getElementById("maintenance").textContent = maintenanceCalories;
+    document.getElementById("target").textContent = targetCalories;
+    
+    let progress = 0;
+    if(targetCalories > 0){
+        progress = Math.min((totalConsumed / targetCalories) * 100, 100);
+        if(totalConsumed > targetCalories){
+            progress = 100;
+            document.getElementById("progress-bar").style.background = "red";
+        } else {
+            document.getElementById("progress-bar").style.background = "var(--primary-red)";
+        }
+    }
+    document.getElementById("progress-bar").style.width = progress + "%";
+    document.getElementById("progress-text").textContent = Math.round(progress) + "%";
+    
+    const gpLabel = goalPeriod.charAt(0).toUpperCase() + goalPeriod.slice(1);
+    document.getElementById("stats-title").textContent = `Total Stats (${gpLabel})`;
+    
+    document.getElementById("net-calories").textContent = netCalories;
+    
+    const maintenanceDiff = maintenanceCalories - netCalories;
+    const goalDiff = targetCalories - netCalories;
+    const diffTextEl = document.getElementById("diff-text");
+    const netCaloriesEl = document.getElementById("net-calories");
+    
+    function getWeightEstimation(calorieDeficit) {
+        const lbsChange = Math.abs(calorieDeficit) / 3500;
+        const kgChange = Math.abs(calorieDeficit) / 7700;
+        const lbsText = lbsChange >= 0.1 ? `${lbsChange.toFixed(1)} lbs` : `${(lbsChange * 16).toFixed(1)} oz`;
+        const kgText = kgChange >= 0.1 ? `${kgChange.toFixed(1)} kg` : `${(kgChange * 1000).toFixed(0)} g`;
+        
+        if (calorieDeficit > 0) {
+            return `Estimated weight loss: <span style="color: var(--primary-red); font-weight: bold;">${kgText}</span> / <span style="color: var(--primary-red); font-weight: bold;">${lbsText}</span>`;
+        } else if (calorieDeficit < 0) {
+            return `Estimated weight gain: <span style="color: red; font-weight: bold;">${kgText}</span> / <span style="color: red; font-weight: bold;">${lbsText}</span>`;
+        } else {
+            return `<span style="color: gold;">Weight maintenance</span>`;
+        }
+    }
+    
+    function getCasualMessage(calorieDeficit) {
+        if (calorieDeficit > 500) {
+            return "Hey mate, you're smashing it! Losing weight like a champion! 💪";
+        } else if (calorieDeficit > 0) {
+            return "Hey mate, you're losing weight! Keep it up! 👍";
+        } else if (calorieDeficit < -500) {
+            return "Hey mate, are you bulking? That's some serious mass gaining! 🏋️‍♂️";
+        } else if (calorieDeficit < 0) {
+            return "Hey mate, looks like you're putting on some weight! 📈";
+        } else {
+            return "Hey mate, you're maintaining perfectly! Well balanced! ⚖️";
+        }
+    }
+    
+    let summaryText = '';
+    
+    // Get the period label based on goal period (ONLY ONCE!)
+    const periodLabel = goalPeriod === "daily" ? "Day" : 
+                       goalPeriod === "weekly" ? "Week" : "Month";
+    
+    // Show calories eaten vs maintenance with proper styling
+    if (maintenanceDiff > 0) {
+        // In deficit - GOOD (under maintenance calories)
+        summaryText += `<span style="color: var(--text-light);">Calories eaten this ${periodLabel}:</span> <span style="color: green; font-weight: bold;">${netCalories} cal</span> <span style="color: var(--text-light);">vs Maintenance Calories:</span> <span style="color: green; font-weight: bold;">${maintenanceCalories} cal</span>`;
+    } else if (maintenanceDiff < 0) {
+        // In surplus - BAD (over maintenance calories)
+        summaryText += `<span style="color: var(--text-light);">Calories eaten this ${periodLabel}:</span> <span style="color: red; font-weight: bold;">${netCalories} cal</span> <span style="color: var(--text-light);">vs Maintenance Calories:</span> <span style="color: red; font-weight: bold;">${maintenanceCalories} cal</span>`;
+    } else {
+        // At maintenance - PERFECT
+        summaryText += `<span style="color: gold;">Calories eaten this ${periodLabel}:</span> <span style="color: gold; font-weight: bold;">${netCalories} cal</span> <span style="color: gold;"> - At Maintenance!</span>`;
+    }
+    
+    summaryText += '<br>' + getWeightEstimation(maintenanceDiff);
+    
+    if(targetCalories > 0){
+        if(goalDiff < 0){
+            netCaloriesEl.style.color = "red";
+        } else if(goalDiff > 0) {
+            netCaloriesEl.style.color = "green";
+        } else {
+            netCaloriesEl.style.color = "gold";
+        }
+    } else {
+        if (maintenanceDiff > 0) {
+            netCaloriesEl.style.color = "green";
+        } else if (maintenanceDiff < 0) {
+            netCaloriesEl.style.color = "red";
+        } else {
+            netCaloriesEl.style.color = "gold";
+        }
+    }
+    
+    diffTextEl.innerHTML = summaryText;
+    
+    const statusEl = document.getElementById("status-message");
+    if(targetCalories > 0){
+        statusEl.innerHTML = getCasualMessage(goalDiff);
+        if(goalDiff < 0){
+            statusEl.style.color = "red";
+        } else if(goalDiff > 0) {
+            statusEl.style.color = "green";
+        } else {
+            statusEl.style.color = "gold";
+        }
+    } else {
+        statusEl.innerHTML = getCasualMessage(maintenanceDiff);
+        if (maintenanceDiff > 0) {
+            statusEl.style.color = "green";
+        } else if (maintenanceDiff < 0) {
+            statusEl.style.color = "red";
+        } else {
+            statusEl.style.color = "gold";
+        }
+    }
+}
+
+loadData();
+document.getElementById("food-day").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") addFood();
+});
+document.getElementById("step-day").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") addSteps();
+});
+</script>
+</body>
+</html>
